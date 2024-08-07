@@ -9,10 +9,27 @@ import os
 
 root = r'C:\Users\user\Desktop\python_camp'
 
+## 자 봐바 하위 폴더면 root 뒤에 \ 에 뭐가 더 붙을거야 
+# 파일이면 .어쩌구 가 없다 
+
 def print_directory_tree(root): 
     # 1) os 디렉토리 구조 출력해보기 
-    for elem in os.listdir():
-        print(elem) 
+    file_list = []
+
+    for elem in os.listdir(root): ##폴더가 아닌 파일 출력 
+        if elem == elem.split('.')[-1]:
+            file_list.append(elem)         
+        else: 
+            print(elem)
+
+    if len(file_list) == 0:
+        print("")
+        return
+    else:  
+        for i in file_list:
+            new_root = os.path.join(root, i)
+            print(f"{new_root}이거 안에는")
+            print_directory_tree(new_root)
 
 print_directory_tree(root)
 
@@ -25,7 +42,6 @@ def list_extension_files(root):
         print(f'{extension} file \t\t{elem}')
 
 # 3) os 디렉토리 복사하기
-import os 
 
 def copy_directory(src, dest): #src의 내용을 dest에 복사한다.
     if os.path.exists(src):

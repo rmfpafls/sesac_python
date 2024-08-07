@@ -70,6 +70,7 @@ def sort3(lst, upper_to_lower = True, cmp = lambda x, y: x):
         return 
 
 sort3(lst,upper_to_lower = True, cmp = lambda x, y: x if len(x)>len(y) else y) 
+
 # if 긴게 최고다 긴게 제일 큰 값이다
 # Q.호출 할때 인자에 cmp = lambda x, y: x if len(x)>len(y) else y 넣어야되나요???? 
 # 넵, 모든 형태를 맞춰서 써야됩니다~
@@ -156,16 +157,69 @@ def safe_dump(pickle_path):
 # level 2 
 import os
 
-def cache_to_txt(function):
-    if not os.path.exists(function):
-        print("없어요")
-        return 'result.txt'
-    else: # 파일 내용을 읽어서 함수를 실행하지 않고, 리턴
+def cache_to_txt(function): 
 
-cache_to_txt('not.txt')
+    def create_dir(directory_name): #디렉토리가 있는지 검색하고 없으면 새로 만들고, 있으면 안만드는 함수 
+        if not os.path.exists(directory_name):
+            print(f'{directory_name} dose not exists;')
+            os.makedirs(directory_name)
+        else: 
+            print(f"{directory_name} dose exists")
+    
+    path =  r'pickle_cache'
+    create_dir(path)
+
+    if not os.path.exists(f"{path}/result.txt"): # 파일이 없다면, 함수의 리턴값을 result.txt에 출력
+        res = function()
+        f = open(f'{path}/result.txt', 'w+', encoding= 'utf-8')
+
+        print(res, file = f)
+        f.close()
+    else: # 파일이 있다면 파일 내용을 읽어서 리턴 
+        f = open('result.txt','r', encoding = 'utf-8')
+        res = f.read()
+        f.close()
+        return res 
+
+cache_to_txt(function = lambda : 'hello world')
 
 
 def cache_to_pickle(function):
-    pass 
+
+    def res(*arg, **kargs):  # res(1)
+        def create_dir(directory_name): #디렉토리가 있는지 검색하고 없으면 새로 만들고, 있으면 안만드는 함수 
+            if not os.path.exists(directory_name):
+                print(f'{directory_name} dose not exists;')
+                os.makedirs(directory_name)
+            else: 
+                print(f"{directory_name} dose exists")
+        
+        path =  r'pickle_cache'
+
+        create_dir(path)
+
+        # print(arg[0]) # 1
+
+        # for i in arg: 
+        #     print(function(i)) #하면 출력 2나옴 !!!!!
+
+        if not os.path.exists(f'{path}/{arg}.pickle'): # 파일이 없다면 함수 실행 후 puck.dump를 통해 저장하고
+            jar = function(*arg, **kargs)# input에 따라 pickle에 저장
+            print(f"\n파일없어서 \n\n{jar} \n\n이거 저장할게요.")
+            pickle.dump(jar, open(f'{path}/{arg}.pickle', 'wb+'))
+            return jar 
+            
+        else: # 파일이 있다면 pickle.load를 통해 읽어오자
+            # 없다면 새로만드는거고  f(2)
+            bottle = pickle.load(open(f'{path}/{arg}.pickle', 'rb'))
+            print("파일있어요\n",bottle)
+
+            return bottle 
+    
+    return res         
+
+def double(x, y): return 2*(x+y)
+
+(cache_to_pickle(double)(2, 3))
 
 
