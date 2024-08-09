@@ -1,211 +1,111 @@
-# 강사님 : 오늘은 "매직매소드" 예제입니다.
-class MyDate:
+import random
 
-    def __init__(self, year = 0, month = 0, day = 0, hour = 0, minute = 0, sec = 0):
-    # d = Mtdate()는 My_date.__init__(...d..) 와 같은 것 
-        self.year = year
-        self.month = month
-        self.day = day
-        self.hour = hour
-        self.minute = minute
-        self.sec = sec
-
-        if self.month > 12 :
-            raise ValueError("1월부터 12월까지 존재합니다.")
-        elif self.year % 4 != 0 and self.month == 2 and self.day >= 29: 
-            # 윤년이 아닌 2월에 day가 29일이 넘어가는 경우 
-            raise ValueError("윤년에만 29일이 존재합니다.")
-        elif self.year % 4 == 0 and self.month == 2 and self.day >= 30:
-            #윤년이고 2월이면서 30일 이상인경우
-            raise ValueError("윤년, 2월에는 29일까지 존재합니다.")
-        elif self.month in [1,3,5,7,8,10,12] and self.day > 31: 
-            raise ValueError(f"{self.month}월은 31일까지 존재합니다.")
-        elif self.month not in [1,3,5,7,8,10,12] and self.day > 30:
-            raise ValueError(f"{self.month}월은 30일까지 존재합니다.")
-        elif self.hour > 24 or minute > 60 or sec > 60: 
-            raise ValueError(f"하루는 24시간, 1시간은 60분, 1분은 60초입니다.")
-
-
-    def __add__(self, other): #더할 때 쓰는 애 
-        #그러면 이 other에 (2022,4,1,14,30)(2024, 2, 1)이런 식으로 들어올 거임
-        # MyDate.__add__(MyDate(2022, 4, 1, 14, 30),  MyDate(2024, 2,1)) 꼴로 들어옴 
-        
-        #1) 월 더하기 (그럼 초부터 더해야겠네!)
-        # 초
-        # 60분이 넘으면 시간에 1을 더하고 0부터 다시시작
-        # 24시간이 넘으면 day에 1을 더하고 0부터 다시시작
-        # case 1) self.day + self.other를 했을 때 self의 달이 [1,3,5,7,8,10,12]였다면 day는 31일이 넘었을때 달에 1을 더하고 초기화
-        # case 2) self.day + self.other를 했을 때 self의 달이 [1,3,5,7,8,10,12,2]가 아니고 day는 30일이 넘었을때 달에 1을 더하고 초기화
-        # case 3) self.day + self.other를 했을 때 self의 달이 2였고 윤년인경우 day는 29일까지
-        # case 4) self.day + self.other를 했을 때 self의 달이 2였고 윤년이 아닌경우 day는 28일까지
-        # month가 12가 넘어가면 year에 1을 더하고 self.year + other.year
-        
-        ## 어떻게?? 빈 리스트를 만들어서 일단 더한다음에 정리 
-        result_date = [self.year+other.year, self.month+other.month,self.day+other.day, self.hour+other.hour,self.minute+other.minute, self.sec+other.sec]
-        
-        if result_date[5] > 60: #60초가 넘어가면 
-            result_date[4] += 1 # 1분을 올리고 
-            result_date[5] -= 60 # 60초를 빼
-        if result_date[4] > 60: #60분이 넘어가면
-            result_date[3] += 1 # 1시간을 올리고
-            result_date[4] -= 60 # 60분을 빼
-        if result_date[3] > 24: #12시가 넘어가면
-            result_date[2] += 1 #1일을 올리고 
-            result_date[3] -= 24 # 12시간을 빼
-        
-
-        # 일계산
-        if result_date[1] > 12: #일을 고려하지 않은 상태에서 self와 other의 월을 더한 값이 12가 넘는 경우
-            result_date[1] -= 12 # 13월이면 12를 빼고
-            result_date[0] += 1  # 년에 1을 더함
-
-        if result_date[1] in [1,3,5,7,8,10,12] and result_date[2] > 31: # 더한 달이 [1,3,5,7,8,10,12]이고 day가 31일이 넘어가는경우
-            result_date[1] += 1
-            result_date[2] -= 31
-        elif result_date[1] not in [1,3,5,7,8,10,12] and result_date[2] > 30:
-            result_date[1] += 1
-            result_date[2] -= 30
-        elif result_date[0] % 4 == 0 and result_date[1] == 2 and result_date[2] > 29: #윤년이고 계산한 달이 2월이고 합한 day가 29이 넘어가면 
-            result_date[1] += 1
-            result_date[2] -= 29
-        elif result_date[0] %4 != 0 and result_date[1] == 2 and result_date[2] > 28: #윤년아니고 계산한 달이 2월이고 합한 day가 28이 넘어가면 
-            result_date[1] += 1
-            result_date[2] -= 29
-
-        if result_date[1]  > 12: #월이 12월을 넘어가면
-            result_date[0] += 1 #년에 1을더하고 
-            result_date[1] -= 12 
-            
-        print(f"더한 값은 {result_date[0]}년 {result_date[1]}월 {result_date[2]}일 {result_date[3]}시 {result_date[4]}분 {result_date[5]}초 ")
-        return MyDate(result_date[0],result_date[1],result_date[2],result_date[3],result_date[4],result_date[5])
-
-        
-
-    def __sub__(self, other):# 뺄 때 쓰는 애 
-    # assert d1 - d3 == MyDate(2022, 3, 31, 14, 30) 
-        result_date = [self.year-other.year, self.month-other.month,self.day-other.day, self.hour-other.hour,self.minute-other.minute, self.sec-other.sec]
-
-        if result_date[5] < 0: # - 초가 되면
-            result_date[4] -= 1 # 1분을 내리고
-            result_date[5] = 60 + result_date[5] # 60초에서 빼
-        elif result_date[4] < 0: # - 분이 되면 
-            result_date[3] -= 1 # 1시간을 내리고
-            result_date[4] = 60 + result_date[4] # 60분에서 빼
-        elif result_date[3] < 0: # - 시가 되면 
-            result_date[2] -= 1 #1일을 내리고
-            result_date[3] = 24 + result_date[3] # 12시간을 빼
-        
-        # 일 계산
-        if result_date[1] <= 0: #월의 뺀 값이 -값이면
-            result_date[1] = 12 + result_date[1]  # 1년을 빌려와서 거기다가 -값 계산 ㄱㄱ 
-            result_date[0] -= 1
-
-
-        if (result_date[0] % 4 == 0) and result_date[1] == 3 and result_date[2] <= 0: # 윤년이고 2월이고 day가 마이너스이면 
-            result_date[2] += 29
-            result_date[1] -= 1      
-        elif (result_date[0] % 4 != 0) and result_date[1] == 3 and result_date[2] <= 0: # 윤년아니고 2월이고 day가 마이너스이면 
-            result_date[2] += 28
-            result_date[1] -= 1      
-        elif (result_date[1] not in [1,3,5,7,8,10,12] ) and result_date[1] != 3 and result_date[2] <= 0: # 윤년이 아니고 2월도 아니면서 day가 마이너스이면 
-            result_date[2] += 31
-            result_date[1] -= 1
-        elif (result_date[1] in [1,3,5,7,8,10,12] ) and result_date[2] <= 0: 
-            result_date[2] += 31
-            result_date[1] -= 1
-
-        # 월 계산
-        if result_date[1] <= 0: # 계산한 월이 - 값이면
-            result_date[0] -= 1  # 계산한 년도에 -값을 하고 
-            result_date[1] = 12 + result_date[1] #12개월
-
-        
-        print(f"뺀 값은 {result_date[0]}년 {result_date[1]}월 {result_date[2]}일 {result_date[3]}시 {result_date[4]}분 {result_date[5]}초 ")
-        return MyDate(result_date[0],result_date[1],result_date[2],result_date[3],result_date[4],result_date[5])
-
-    def __eq__(self, other): # 같을 때
-        self_date = [self.year, self.month,self.day, self.hour,self.minute, self.sec]
-        other_date = [other.year, other.month,other.day, other.hour,other.minute, other.sec]
-        
-        if len(self_date) == len(other_date):
-            for i in range(len(self_date)):
-                if self_date[i] != other_date[i]:
-                    return False
-            return True
-        else:
-            return False
-
-    def __lt__(self, other):# d1, d2가 주어졌을 때, d1이 d2보다 작을 때
-        result_date = [self.year-other.year, self.month-other.month,self.day-other.day, self.hour-other.hour,self.minute-other.minute, self.sec-other.sec]
-
-        for i in range(result_date):
-            if i >= 0:
-                return False
-        return True
-
-    def __le__(self, other):# d1이 d2보다 같거나 작을 때
-        result_date = [self.year-other.year, self.month-other.month,self.day-other.day, self.hour-other.hour,self.minute-other.minute, self.sec-other.sec]
-
-        for i in range(result_date):
-            if i > 0:
-                return False
-        return True
-        
-
-    def __gt__(self, other):# d1이 d2보다 클때
-        result_date = [self.year-other.year, self.month-other.month,self.day-other.day, self.hour-other.hour,self.minute-other.minute, self.sec-other.sec]
-
-        for i in range(result_date):
-            if i <= 0:
-                return False
-        return True
-        
-
-    def __ge__(self, other):# d1가 d2보다 같거나 클때
-        result_date = [self.year-other.year, self.month-other.month,self.day-other.day, self.hour-other.hour,self.minute-other.minute, self.sec-other.sec]
-
-        for i in range(result_date):
-            if i < 0:
-                return False
-        return True
+def play_match(self, player1, player2): 
+    # win_lose_history를 update
+    # player1, player2의 win_lose_history를 update하고 
+    # elo rating 알고리즘에 따라 각자의 current_rating을 update할 것 
+    # https://namu.wiki/w/Elo%20%EB%A0%88%EC%9D%B4%ED%8C%85 참고
     
-    def __str__(self):
-        return f'{self.year}/{self.month}/{self.day} {self.hour}:{self.minute}:{self.sec}'
+    pass
+
+def match_players(self): # 7명 중에 2명을 골라줘 self = list 값이 들어옴 
+#self = ['player_0', 'player_1', 'player_2', 'player_3', 'player_4', 'player_5', 'player_6']
+    empty_room = []
+
+    for i in range(len(self)):#플레이어 7명이 순서대로 게임을 실행하는 경우
+        if not len(empty_room): # 빈방이면
+            empty_room.append(self[i])
+        else: # 방에 누군가 있을때
+            for j in range(len(empty_room)):
+                if empty_room[j].current_rating - self[i].current_rating < 100: # rating 차이가 110 이하이면 
+                    player1 = empty_room.pop(j)
+                    player2 = self[i]
+                    simulate([player1,player2])
+                    break # for 문 나가기 
+                else: # rating 차이가 100 이상이면 
+                    empty_room.append(self[i]) #빈 방에 가서 기다려라 
+            
+    while len(empty_room): 
+        # 방에 한명이라도 남아있는 경우
+        # 정렬을 해서 가장 rating 차이가 적은 애들끼리 붙여줘야지 뭐
         
+        for i in range(len(empty_room)): # 레이팅 순으로 정렬 
+            for j in range(i+1, len(empty_room)): 
+                if empty_room[i].current_rating > empty_room[j].current_rating:
+                    empty_room[i], empty_room[j] = empty_room[j], empty_room[i]
 
+        while not len(empty_room) == 1: # 둘 둘 짝지어서 simulate()돌려
+            for i in range(len(empty_room)%2):
+                    player1 = empty_room.pop(i)
+                    player2 = empty_room.pop(i+1)
+        
+        if len(empty_room) == 1: 
+            waiting_raitng = empty_room[0].current_rating - 50
+            # 가상의 인스턴스를 만들어서 계산하고 다시 넣어 
+            waiting_actual_raiting = empty_room[0].actual_rating
+            player_waiting = Player(player_id = 'waiting_player', actual_rating = waiting_actual_raiting)
+            player_waiting.current_rating = waiting_raitng
+            print("확인하려는     거 ", player_waiting.current_rating)
 
-if __name__ == '__main__':
-    # d0 = MyDate()
-    d1 = MyDate(2024, 3,1)
-    # # d2 = MyDate(2024, 8, 100, 23, 10) # should raise an error 
-    # # 100일이라는게 말인 안되니까 error발생
-    # # 윤년이면 29일까지있죠 
-    # # # 윤년이면 1년에 366일, 년이 4로 나누어 떨어지면 윤년임 
-    # d3 = MyDate(4,2,10) 
-
-    # print(d1-d3)
-
-    # MyDate.__add__(d1, d3)
-    # assert d1 + d3 == MyDate(2022, 4, 2, 14, 30)# 14시 30분 
-    d1 = MyDate(2023, 1, 1, 0, 0, 0)
-    d2 = MyDate(sec = 1)
-    d3 = MyDate(minute = 50) 
-    d4 = MyDate(day = 10)
-
-    for d in [d2, d3, d4]:
-        print(d1 + d)
-
-    # d1 = MyDate(2023, 1, 31, 0, 0, 0)
-    # d2 = MyDate(day = 31)
-    # d1 = MyDate(2024, 12, 20, 0, 0, 0)
-
-    for i in range(30):
-        d2 = MyDate(day = i)
-        print(d1-d2)
+        print(empty_room)
 
 
 
 
+def simulate(self): # 누가 이기나//어쨌든 플레이어2명이 self로 들어올거임
+    # self = ['player_0', 'player_6'] 이런꼴
+    # 비겼을 때 생각안할거임 히히 승부의 세계는 그런거임  
+    sum_rating = self[0].actual_rating + self[1].actual_rating # 1000 1020 =  2020
+    player_A_float = self[0].actual_rating / sum_rating # 0.5
+    player_B_float = self[1].actual_rating  # 0.495
+    random_winner = random.uniform(0,player_A_float+player_B_float) 
 
-# # d2 = MyDate(2024, 8, 100, 23, 10)
-# print(d1+d3)
+    def calculator(winner,loser):
+        winner_winning_percentage = 1 / (10**((loser.current_rating - winner.current_rating) / 400) + 1)
+        loser_winning_percentage= 1 / (10**((winner.current_rating - loser.current_rating)/400)+1)
+        winner.current_rating = winner.current_rating + 20*(1-winner_winning_percentage)
+        loser.current_rating = loser.current_rating + 20*(0-loser_winning_percentage) 
+
+    if (random_winner - player_A_float) > (random_winner - player_B_float):
+        print(f"{self[0].player_id} win")
+        self[0].win_lose_history.append("win")
+        self[1].win_lose_history.append("lose")
+        calculator(self[0],self[1])
+
+    else: 
+        print(f"{self[1]} win")
+        self[0].win_lose_history.append("lose")
+        self[1].win_lose_history.append("win")
+        calculator(self[1],self[0])
+    
+    print(self[0].player_id, ":  승리!" )
+    print(self[0].player_id, "의 전적입니다.", self[0].win_lose_history)
+    print(self[0].player_id, "의 current_rating입니다.", self[0].current_rating)
+    print(self[1].player_id, ":  패배!" )
+    print(self[1].player_id, "의 전적입니다.", self[1].win_lose_history)
+    print(self[1].player_id, "의 current_rating입니다.", self[1].current_rating)   
+    
+
+class Player:
+    def __init__(self, player_id, initial_rating = 1000, actual_rating = 1000):
+        self.player_id = player_id
+        self.win_lose_history = []
+        self.current_rating = initial_rating
+        self.actual_rating = actual_rating
+
+    def __str__(self):# 객체 자체를 출력할 때 넘겨주는 형식을 지정해주는 메서드 
+        return str(self.player_id)
+    
+
+player_list = [Player(player_id = f"player_id_{i}", actual_rating = 1000 + 50*random.randint(0,7)) for i in range(0,7)] # Player의 인스턴스 생성
+
+
+for z in range(len(player_list)):# 플레이어들의 actual_rating 보여주기 
+    print( player_list[z],"의 actual_rating : ", player_list[z].actual_rating)
+
+# match_players(player_list)
+# print("확인하려는거", player_list[0])
+
+# simulate([player_list[0],player_list[1]])
+
+match_players(player_list)
