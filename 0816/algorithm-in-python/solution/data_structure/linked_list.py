@@ -15,7 +15,7 @@ class LinkedList:
         else:
             size = 0
             for idx, e in enumerate(elements):
-                assert isinstance(e, LinkedNode) #특정 객체가 특정 클래스 또는 타입에 속하는지 확인하는데 사용되는 내장함수
+                assert isinstance(e, LinkedNode)
                 if idx < len(elements) - 1:
                     e.next = elements[idx+1]
                 size += 1
@@ -32,7 +32,6 @@ class LinkedList:
             self.size = size 
 
     def __iter__(self):
-        # __iter__메서드는 이터레이터 객체를 반환해야한다. 
         cur = self.head
 
         while cur is not None:

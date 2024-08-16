@@ -1,0 +1,56 @@
+# PriorityQueue 이거 짤 때
+# element를 sort해서 Linked_list 로 넣어줘도 되지만 
+# 사실 Linked_list로 만든다음에 merge를 사용해서 sort하는 것이 더 빠르다 
+# 왜냐? merge_sort Linked_list는 head랑 end만 가지고 다 만들 수 있기때문에
+# 런닝타임이 단축된다. 
+
+def merge_sort(lst):
+    l = len(lst)
+    left, right = lst[:l//2], lst[l//2:]
+
+    return merge(merge_sort(left), merge_sort(right)) 
+
+def merge(left, right):
+    pass 
+
+def merge_sort_linked(lst):
+    l = len(lst)
+
+    cur = lst.head 
+    cur_idx = 0 
+
+    while cur is not None:
+        # if cur_idx < l//2:
+        #     left.append(cur)
+        # else:
+        #     right.append(cur)
+        if cur_idx == l//2:
+            mid = cur 
+        cur = cur.next 
+        cur_idx += 1 
+
+    left = LinkedList.init_from_head_and_end(lst.head, mid)
+    right = LinkedList.init_from_head_and_end(mid.next, lst.end)
+
+    return merge_linked(merge_sort_linked(left), merge_sort_linked(right))
+
+def merge_linked(left, right):
+    left_cur = left.head 
+    right_cur = right.head 
+
+    result_linked_list = LinkedList([])
+
+    while result_linked_list.size < left.size + right.size: 
+        if left_cur < right_cur:
+            result_linked_list.append(left_cur) 
+            left_cur = left_cur.next 
+        else:
+            result_linked_list.append(right_cur) 
+            right_cur = right_cur.next 
+
+    if left_cur == left.end:
+        result_linked_list.end.next = right.head 
+    else:
+        result_linked_list.end.next = left.head 
+
+    return result_linked_list

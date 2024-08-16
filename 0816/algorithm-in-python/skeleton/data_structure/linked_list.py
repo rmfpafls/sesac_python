@@ -10,29 +10,17 @@ class LinkedNode:
         self.next = next 
 
 class LinkedList:
-    def __init__(self, elements):#elements = 1,2,3,4
-        elements_list = list(elements)
-
-        if elements_list == []:
+    def __init__(self, elements):
+        if elements == []:
             self.head = None 
             self.tail = None 
             self.end = None
             self.size = 0
         else:
-            for idx, e in enumerate(elements_list):
-                n = LinkedNode(node_id = idx, datum = e)
-                elements_list[idx] = n
-            
-            for idx, e in enumerate(elements_list):
-                if idx != len(elements_list) -1: 
-                    e.next = elements_list[idx+1]
-
-            elements_list[-1].next = None
-
-            self.head = elements_list[0]
-            self.tail = elements_list[1:]
-            self.end = elements_list[-1]
-            self.size = len(elements_list)
+            self.head = None 
+            self.tail = None 
+            self.end = None
+            self.size = 0
 
     def __iter__(self):
         yield None 
@@ -70,12 +58,3 @@ class DoublyLinkedList:
 
         return res 
 
-if __name__ == "__main__":
-    lst = LinkedList(1,2,3,4)
-
-    assert lst.head.datum == 1
-    assert lst.head.next.datum == 2
-    assert lst.head.next.next.datum == 3
-    assert lst.head.next.next.next.datum == 4
-    assert lst.head.next.next.next.next is None
-    assert lst.head.next.next.next == lst.end
