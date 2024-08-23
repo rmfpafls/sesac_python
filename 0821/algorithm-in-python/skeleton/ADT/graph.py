@@ -83,14 +83,28 @@ class Graph:
         # src는 시작점 v1= Vertex(0,1)처럼 vertex객체가 들어감 
         # 그래프의 모든 vertex를 root에서 시작하여 각각 dfs, bfs로 순회
 
-        # 1. src 값에서 시작해 get_neighbor를 사용해서 이웃 중에 가장 작은 값으로
-        # 2. 가장 작은 값에서 시작해 get_neighbor 해서 작은 값으로
-        # 3. 계속하다가 없으면 그 전 함수로 들어와서 get_neighbor 중에 방문하지 않은 값이 있으면 다시 거기로 들어가 
+        # 1. src 값에서 시작해 get_neighbor를 사용해서 이웃 중에 하나로 
+        # 2. 그 이웃의 방문하지않은 이웃으로 
+        # 3. 계속하다가 없으면 그 전 이웃으로 들어와서 get_neighbor 중에 방문하지 않은 값이 있으면 다시 거기로 들어가 
         # 이걸 재귀로 하면 돼
         # 는데 말이 쉽지
-        dfs_result = []
+
+        dfs_result = [src]
         dfs_visited = [src]
-        pass
+
+        def in_to_the_dfs(self,src):
+            while get_neighbors(self,src) != []:
+                for i in get_neighbors(self,src): 
+                    if i not in dfs_visited: 
+                        dfs_visited.append(i)
+                        return in_to_the_dfs(self, i)
+        return in_to_the_dfs(self, src)
+        
+        print("dfs result : ",[i.datum for i in dfs_visited])
+    
+
+
+        
 
         
          
@@ -98,7 +112,7 @@ class Graph:
 
     def bfs(self, src):
         assert isinstance(src, Vertex) 
-        
+        # 강사님이 v1에서 v2를 먼저가던 v3를 먼저 가던 상관 없다고 하셨음
         visited = [src] #방문한 노드 리스트
         result = []
 
