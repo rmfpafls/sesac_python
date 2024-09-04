@@ -30,7 +30,20 @@ def crawl_ranking_news(): #인기순 #모든 언론사의 링크랑 제목을 �
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
+    
+    # 강사님 풀이 
+        for div in soup.find_all('div', {'class': "rankingnews_box"}):
+            press_name = div.find('strong')
 
+            for li in div.find_all('li'):
+                content = li.find('div', {'class': 'list_content'})
+                if content is not None:
+                    a = content.find('a')
+                    print(a['href'], a.text)
+
+
+"""
+    #내가 짠 코드 
         td = soup.find('div',{'class' : 'rankingnews _popularWelBase _persist'})
         #print(td)
 
@@ -47,6 +60,7 @@ def crawl_ranking_news(): #인기순 #모든 언론사의 링크랑 제목을 �
                         text = a.text
                         print(link, text)
             print("\n")
+"""
 
 
 if __name__ == '__main__':
