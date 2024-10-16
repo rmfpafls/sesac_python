@@ -6,9 +6,6 @@ from collections import defaultdict
 
 from load_file import load_file
 
-
-
-
 OOV = '[OOV]'
 PAD = '[PAD]'
 
@@ -84,23 +81,6 @@ def determine_max_length(data, threshole = 0.99):
         
     # return max(lst, key = lambda x:x[0]) # 제일 긴 단어 길이 - 이거 사용안하는데 왜 씀 
 
-def split_train_valid_test(x, y, train_size = 0.8, valid_size = 0.1, test_size = 0.1):
-    
-    train_max = int(len(x)*train_size)
-
-    train_x = x[:train_max]
-    train_y = y[:train_max]
-
-    valid_max = int(train_max + len(x)*valid_size)
-
-
-    valid_x = x[train_max:valid_max]
-    valid_y = y[train_max:valid_max]
-
-    test_x = x[valid_max:]
-    test_y = y[valid_max:]
-
-    return train_x, train_y, valid_x, valid_y, test_x, test_y 
 
 def generate_dataset(batch_size = 32, pad = PAD, oov = OOV):
     data, languages = load_file()
@@ -116,30 +96,46 @@ def generate_dataset(batch_size = 32, pad = PAD, oov = OOV):
             if char.lower() in alphabets: 
                 tmp.append(char.lower())
             else: 
-                tmp.append(oov) 
+                tmp.append(oov)
+
         
         data[idx][0] = word2tensor(tmp, max_length, alphabets, pad = PAD, oov = OOV)
         data[idx][1] = languages.index(data[idx][1]) # languages를 인덱스 형태로 바꿈
+    
+    return data, alphabets, max_length, languages
+    # # print("data :", len(data))
 
-    x = [e[0] for e in data]
-    y = [torch.tensor(e[1]) for e in data] 
+    # x = [e[0] for e in data]
+    # y = [torch.tensor(e[1]) for e in data] 
 
-    train_x, train_y, valid_x, valid_y, test_x, test_y = split_train_valid_test(x,y)
+    # train_x, train_y, valid_x, valid_y, test_x, test_y = split_train_valid_test(x,y)
+    # # print(len(train_x)) # 16059
 
-    train_x = torch.stack(train_x)
-    train_y = torch.stack(train_y)
-    valid_x = torch.stack(valid_x)
-    valid_y = torch.stack(valid_y)
-    test_x = torch.stack(test_x)
-    test_y = torch.stack(test_y)
+    # train_x = torch.stack(train_x)
+    # train_y = torch.stack(train_y)
+    # valid_x = torch.stack(valid_x)
+    # valid_y = torch.stack(valid_y)
+    # test_x = torch.stack(test_x)
+    # test_y = torch.stack(test_y)
 
-    train_dataset = TensorDataset(train_x, train_y)
-    valid_dataset = TensorDataset(valid_x, valid_y)
-    test_dataset = TensorDataset(test_x, test_y)
+    # # print("train_x :", len(train_x) )
 
-    train_dataloader = DataLoader(train_dataset, batch_size = batch_size, shuffle= True)
-    valid_dataloader = DataLoader(valid_dataset, batch_size = batch_size, shuffle= True)
-    test_dataloader = DataLoader(test_dataset, batch_size = batch_size, shuffle = True)
+    # train_dataset = TensorDataset(train_x, train_y)
+    # valid_dataset = TensorDataset(valid_x, valid_y)
+    # test_dataset = TensorDataset(test_x, test_y)
 
-    return train_dataset, valid_dataset, test_dataset, alphabets, max_length, languages
+    # # print("train_dataset : ", len(train_dataset))
+
+    # train_dataloader = DataLoader(train_dataset, batch_size = batch_size, shuffle= True)
+    # valid_dataloader = DataLoader(valid_dataset, batch_size = batch_size, shuffle= True)
+    # test_dataloader = DataLoader(test_dataset, batch_size = batch_size, shuffle = True)
+
+
+    # for batch_x, batch_y in train_dataloader:
+    #     print(batch_x.shape)  # (32, D) 형태
+    #     print(batch_y.shape)  # (32,) 또는 (32, C) 형태
+    #     break
+
+    # return train_dataloader, valid_dataloader, test_dataloader, alphabets, max_length, languages
+
  
