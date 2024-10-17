@@ -6,22 +6,17 @@ import random
 
 
 
-def train_model(self, train_data, valid_data, device,  epochs = 100, learning_rate = 0.001,): 
+def train_model(self, train_data, valid_data, device, epochs = 100, learning_rate = 0.001): 
     criterion = F.nll_loss
     optimizer = optim.Adam(self.parameters(), lr = learning_rate)
 
-    step = 0 
     train_loss_history = []
-    valid_loss_history = []
 
-    train_log = {} 
 
     for epoch in  range(epochs):
+        self.train()
         for x, y in train_data: 
-            x.to(device)
-            y.to(device)
-            step += 1
-            y_pred = self(x)
+            y_pred = self(x, device)
             loss = criterion(y_pred, y)
 
             loss.backward() 
@@ -30,8 +25,10 @@ def train_model(self, train_data, valid_data, device,  epochs = 100, learning_ra
 
             mean_loss = torch.mean(loss).item() 
 
-            if step % 10 == 0: 
-                train_loss_history.append(mean_loss)
-                print(f'Epoch : {epoch+1}, train_loss : {mean_loss}')
+        if epoch % 10 == 0: 
+            train_loss_history.append(mean_loss)
+            print(f'Epoch : {epoch}, train_loss : {mean_loss}')
+    
+    print("train_loss_history : ", train_loss_history)
 
-    return train_loss_history, valid_loss_history
+    return train_loss_history

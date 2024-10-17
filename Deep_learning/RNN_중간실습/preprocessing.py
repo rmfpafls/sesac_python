@@ -22,7 +22,7 @@ def letter2tensor(letter, alphabets, oov = OOV):
     return torch.tensor(res)
     
 def word2tensor(word, max_length, alphabets, pad = PAD, oov = OOV):
-    res = torch.zeros(max_length, len(alphabets))
+    res = torch.zeros(max_length, len(alphabets)) # 12 32
 
     for idx, char in enumerate(word): 
         if idx < max_length: 
@@ -32,6 +32,23 @@ def word2tensor(word, max_length, alphabets, pad = PAD, oov = OOV):
         res[len(word)+i] = letter2tensor(pad, alphabets, oov = OOV)
     return res
 
+def split_train_valid_test(x, y, train_size = 0.8, valid_size = 0.1, test_size = 0.1):
+    
+    train_max = int(len(x)*train_size)
+
+    train_x = x[:train_max]
+    train_y = y[:train_max]
+
+    valid_max = int(train_max + len(x)*valid_size)
+
+
+    valid_x = x[train_max:valid_max]
+    valid_y = y[train_max:valid_max]
+
+    test_x = x[valid_max:]
+    test_y = y[valid_max:]
+
+    return train_x, train_y, valid_x, valid_y, test_x, test_y 
 
 def determine_alphabets(data, pad = PAD, oov = OOV, threshold = 0.999):
     lst = []
@@ -98,15 +115,15 @@ def generate_dataset(batch_size = 32, pad = PAD, oov = OOV):
             else: 
                 tmp.append(oov)
 
+        # data = [[name(lower, oov처리 끝), lang], 
         
         data[idx][0] = word2tensor(tmp, max_length, alphabets, pad = PAD, oov = OOV)
         data[idx][1] = languages.index(data[idx][1]) # languages를 인덱스 형태로 바꿈
-    
-    return data, alphabets, max_length, languages
-    # # print("data :", len(data))
 
-    # x = [e[0] for e in data]
-    # y = [torch.tensor(e[1]) for e in data] 
+    x = [e[0] for e in data]
+    y = [torch.tensor(e[1]) for e in data] 
+
+    return x,y, alphabets, max_length, languages, batch_size
 
     # train_x, train_y, valid_x, valid_y, test_x, test_y = split_train_valid_test(x,y)
     # # print(len(train_x)) # 16059
@@ -131,10 +148,9 @@ def generate_dataset(batch_size = 32, pad = PAD, oov = OOV):
     # test_dataloader = DataLoader(test_dataset, batch_size = batch_size, shuffle = True)
 
 
-    # for batch_x, batch_y in train_dataloader:
-    #     print(batch_x.shape)  # (32, D) 형태
-    #     print(batch_y.shape)  # (32,) 또는 (32, C) 형태
-    #     break
+    # # for batch_x, batch_y in train_dataloader:
+    # #     print(batch_x.shape)  # (32, D) 형태
+    # #     print(batch_y.shape)  # (32,) 또는 (32, C) 형태
 
     # return train_dataloader, valid_dataloader, test_dataloader, alphabets, max_length, languages
 
