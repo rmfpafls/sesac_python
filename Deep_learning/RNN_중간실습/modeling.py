@@ -18,3 +18,15 @@ class FeedForwardNetwork(nn.Module):
         output = self.layer2(output).to(device) # 384 18
         output = F.log_softmax(output, dim = 1).to(device)  # 32 18 
         return output 
+    
+# class RNN(nn.Moudel): 
+#     def __init__(self, alphabets, hidden_size, languages, max_length): 
+#         super(RNN, self).__init__()
+
+#         self.i2h = nn.Linear(len(alphabets) * max_length, hidden_size)
+#         self.h2h = nn.Linear(hidden_size, hidden_size)
+#         self.h2o = nn.Linear(hidden_size, len(alphabets))
+#         self.optimizer = optim.Adam
+#         # self.loss = torch.nn.
+
+#     # def forward() 
