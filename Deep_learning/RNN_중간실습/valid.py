@@ -26,7 +26,7 @@ def valid(model, valid_dataset, learning_rate, device):
             model_state = loss_and_model_dict[(key[0], key[1], key[2])]
             model.load_state_dict(model_state)
 
-    accuarcy, min_loss, file_path, pickle_loss_and_model, loss_list  = model_evaluate(model, valid_dataset, device, lr)
+    accuarcy, min_loss, pickle_loss_and_model, loss_list  = model_evaluate(model, valid_dataset, device, lr)
     print("valid_accuarcy :", accuarcy)
     print("valid_min_loss :", min_loss)
     

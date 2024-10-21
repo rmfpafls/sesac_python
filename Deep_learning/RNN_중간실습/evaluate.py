@@ -14,7 +14,7 @@ def model_evaluate(self, test_data, device, lr):
     total = 0 
     save_loss = math.inf
     pickle_loss_and_model = {}
-    file_path = 'loss_history.pkl'
+
 
     with torch.no_grad(): 
         for x, y in test_data: 
@@ -35,10 +35,10 @@ def model_evaluate(self, test_data, device, lr):
     min_loss = sorted(loss_list)[0]
     pickle_loss_and_model[(lr, save_loss, accuarcy)] = state_dict
 
-    print("Accuarcy :", accuarcy)
-    print("Min_loss :", min_loss)      
+    # print("Accuarcy :", accuarcy)
+    # print("Min_loss :", min_loss)      
 
-    return accuarcy, min_loss, file_path, pickle_loss_and_model, loss_list
+    return accuarcy, min_loss, pickle_loss_and_model, loss_list
 
 def save_file(file_path, pickle_loss_and_model):
     if os.path.exists(file_path): # 파일이 있다면 

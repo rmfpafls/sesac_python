@@ -4,8 +4,6 @@ import torch.optim as optim
 import torch.nn.functional as F 
 import random 
 
-
-
 class FeedForwardNetwork(nn.Module): 
     def __init__(self, alphabets, hidden_size, languages, max_length): 
         super(FeedForwardNetwork, self).__init__()
@@ -19,14 +17,19 @@ class FeedForwardNetwork(nn.Module):
         output = F.log_softmax(output, dim = 1).to(device)  # 32 18 
         return output 
     
-# class RNN(nn.Moudel): 
-#     def __init__(self, alphabets, hidden_size, languages, max_length): 
-#         super(RNN, self).__init__()
+class RNN(nn.Module): 
+    def __init__(self, alphabets, hidden_size, languages, max_length): 
+        super(RNN, self).__init__()
+        self.i2h = nn.Linear(len(alphabets) * max_length, hidden_size)
+        self.h2h = nn.Linear(hidden_size, hidden_size)
+        self.h2o = nn.Linear(hidden_size, len(alphabets))
+        self.optimizer = optim.Adam
 
-#         self.i2h = nn.Linear(len(alphabets) * max_length, hidden_size)
-#         self.h2h = nn.Linear(hidden_size, hidden_size)
-#         self.h2o = nn.Linear(hidden_size, len(alphabets))
-#         self.optimizer = optim.Adam
-#         # self.loss = torch.nn.
-
-#     # def forward() 
+    def forward(self, x, device, hidden):
+        hidden = F.tanh(self.i2h(x)+ self.h2h(hidden))
+        output = self.h2o(hidden)
+        output = self.softmax(output)   
+        return output
+    
+    def init_hidden(self): 
+        return torch.zeros(1, self.hidden_size)

@@ -3,16 +3,9 @@ from torch.utils.data import DataLoader, TensorDataset
 import numpy as  np
 
 def ffn_dataset(x,y,batch_size): 
-    # print("len(x) : ", len(x))
-    # print("len(x[0]) :", len(x[0]))
-    # print("len(x[0][0]) :", len(x[0][0]))
-    # print('len(y) : ', len(y))
-
     x = np.array(x)
     x = x.reshape(20074,384)
-    # print("x.shape :", x.shape) # torch.Size([20074, 12, 32])
     x = x.tolist()
-    # print("len(x) : ", len(x))
 
     train_x, train_y, valid_x, valid_y, test_x, test_y = split_train_valid_test(x,y)
 
@@ -23,13 +16,9 @@ def ffn_dataset(x,y,batch_size):
     test_x = torch.stack([torch.tensor(item) for item in test_x])
     test_y = torch.tensor(test_y) 
 
-    # print("train_x :", len(train_x) )
-
     train_dataset = TensorDataset(train_x, train_y)
     valid_dataset = TensorDataset(valid_x, valid_y)
     test_dataset = TensorDataset(test_x, test_y)
-
-    # print("train_dataset : ", len(train_dataset))
 
     train_dataloader = DataLoader(train_dataset, batch_size = batch_size, shuffle= True)
     valid_dataloader = DataLoader(valid_dataset, batch_size = batch_size, shuffle= True)
