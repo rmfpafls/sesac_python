@@ -1,3 +1,6 @@
-from preprocessing import load_file
+from preprocessing import generate_dataset
+# from modeling import 
+
 if __name__ == "__main__":
-    load_file()
+    train_dataloader, valid_dataloader, test_dataloader = generate_dataset() 
+
