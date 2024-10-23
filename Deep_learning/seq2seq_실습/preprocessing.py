@@ -2,6 +2,7 @@ import glob
 import torch
 import numpy as np 
 from torch.utils.data import DataLoader, TensorDataset
+from collections import defaultdict
 
 
 def load_file(): 
@@ -29,10 +30,14 @@ def load_file():
 
     return eng_token, fra_token 
 
-def dict_vocab(sentences):
+def dict_vocab(sentences, voca, max_length): 
+    """
+    eng_voca : List : [(단어, 쓰인 횟수), ()]
+    
+    """
     word2idx = {} 
     idx2word = {}
-    idx = 3
+    idx = 4
 
     word2idx['[PAD]'] = 0
     idx2word[0] = '[PAD]'
@@ -43,25 +48,63 @@ def dict_vocab(sentences):
     word2idx['EOS'] = 2
     idx2word[2] = '[EOS]'
 
+    word2idx['OOV'] = 3
+    idx2word[3] = '[OOV]'
+
     for sentence in sentences: 
         for word in sentence: 
-            if word not in word2idx: 
-                word2idx[word] = idx
-                idx2word[idx] = word
-                idx += 1
+            for i in voca:
+                if word not in word2idx:
+                    if word in i[0]: 
+                        word2idx[word] = idx
+                        idx2word[idx] = word
+                        idx += 1
+    print(word2idx)
     return word2idx, idx2word
 
-def determine_max_sentence(token, threshold = 0.999): 
-    max_length = 0
+def threshold_word_voca(sentences, threshold = 0.99): 
+    word_count_list = []
+    vocab_dict = defaultdict(int)
+    word_total_count = 0
+    sorted_count = 0 
 
-    for i in token: 
-        length = len(i)
+    for sentence in sentences: 
+        for word in sentence: 
+            vocab_dict[word.lower()] += 1
+            word_total_count += 1
 
-        if max_length < length: 
-            max_length = length
-    print(max_length)
-    max_length = int(threshold*max_length)
+    sorted_lst = sorted(vocab_dict.items(), key = lambda item: item[1], reverse = True)
+    word_total_count = word_total_count * threshold
 
+    for i in sorted_lst: #[('word', word_count)]
+        if sorted_count < word_total_count: 
+            word_count_list.append(i)
+            sorted_count += i[1]   
+
+    return word_count_list
+
+def determine_max_sentence(sentences, threshold = 0.99): 
+    # eng_max_length = determine_max_sentence(eng_sentences)
+    lst = []
+    word_count_dict = defaultdict(int)
+    total_sentence_length = 0
+    sentence_count = 0 
+
+    for sentence in sentences: 
+        count = len(sentence)
+        word_count_dict[count] += 1
+        total_sentence_length += count 
+
+    
+    sorted_lst = sorted(word_count_dict.items(), key = lambda x: x[1], reverse=True)
+    total_sentence_length = total_sentence_length*threshold
+
+    for i in sorted_lst: 
+        if sentence_count < total_sentence_length:
+            sentence_count += i[1]
+            lst.append(i)
+    max_length = max(word_count_dict.items(), key = lambda x: x[0])
+    # print(max_length[0]) # eng : 47, fra : 54
     return max_length
 
 def sentence2idx(sentences, word2idx, max_length): 
@@ -119,14 +162,17 @@ def split_train_valid_test(x, y, train_size = 0.8, valid_size = 0.1, test_size =
 
 
 def generate_dataset():  
-    eng_sentences, fra_sentences = load_file() 
+    eng_sentences, fra_sentences = load_file() # eng_sentences = [['word','word','word']. []]
 
-    eng_max_length = determine_max_sentence(eng_sentences) #46 => sos 46 eos => 48
-    fra_max_length = determine_max_sentence(fra_sentences) #53
+    eng_voca = threshold_word_voca(eng_sentences, threshold = 0.99) # [(word, word_count), ()]
+    fra_voca = threshold_word_voca(fra_sentences, threshold = 0.99)
 
-    eng_word2idx, eng_idx2word = dict_vocab(eng_sentences)
-    fra_word2idx, fra_idx2word = dict_vocab(fra_sentences)
+    eng_max_length = determine_max_sentence(eng_sentences) # 36
+    fra_max_length = determine_max_sentence(fra_sentences) # 39
 
+    eng_word2idx, eng_idx2word = dict_vocab(eng_sentences, eng_voca, eng_max_length) # 47
+    fra_word2idx, fra_idx2word = dict_vocab(fra_sentences, eng_voca, eng_max_length) # 54
+    return 
     eng_idx_sentence = sentence2idx(eng_sentences, eng_word2idx, eng_max_length) # [idx, pad]
     fra_idx_sentence = sentence2idx_with_tokens(fra_sentences, fra_word2idx, fra_max_length)
 
@@ -155,6 +201,6 @@ def generate_dataset():
     valid_dataloader = DataLoader(valid_dataset, batch_size = batch_size, shuffle= True)
     test_dataloader = DataLoader(test_dataset, batch_size = batch_size, shuffle = True)
 
-    return train_dataloader, valid_dataloader, test_dataloader
+    return train_dataloader, valid_dataloader, test_dataloader, eng_max_length, fra_max_length, eng_word2idx, fra_word2idx, eng_idx2word, fra_idx2word, eng_idx_sentence, fra_idx_sentence
 
 

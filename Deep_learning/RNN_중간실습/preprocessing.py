@@ -57,8 +57,9 @@ def determine_alphabets(data, pad = PAD, oov = OOV, threshold = 0.999):
     for name, lang in data: 
         for char in name: 
             character_dict[char.lower()] += 1 # 이거 알파벳이 아닌 글자에는 그대로 나오기 때문에 lower() 가능
-    
-    for k, v in character_dict.items(): 
+            # chacter_dict : 각 문자당 사용된 횟수 
+
+    for k, v in character_dict.items(): # k : 문자, v : 횟수
         lst.append((k,v))
 
     lst = sorted(lst, key = lambda x: x[1], reverse = True)
@@ -77,7 +78,7 @@ def determine_alphabets(data, pad = PAD, oov = OOV, threshold = 0.999):
 
     return alphabets
 
-def determine_max_length(data, threshole = 0.99):
+def determine_max_length(data, threshold = 0.99):
     lst = []
     name_length_dict = defaultdict(int)
 
@@ -93,7 +94,7 @@ def determine_max_length(data, threshole = 0.99):
 
     for k, v in lst: 
         s += v
-        if s > threshole * total_count: 
+        if s > threshold * total_count: 
             return k -1 # threshole퍼센트 이상이면 그 전 단어 횟수만큼만 사용하겠다. 
         
     # return max(lst, key = lambda x:x[0]) # 제일 긴 단어 길이 - 이거 사용안하는데 왜 씀 
