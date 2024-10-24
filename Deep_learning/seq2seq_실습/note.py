@@ -1,10 +1,6 @@
-lst = [('a',1), ('b',2)]
-a_lst = []
+test = [1,2,3,4,5,6]
 
-for i in lst: 
-    a_lst.append+
+for i in range(-3): 
+    test.append('7')
 
-    
-
-if 'a' in lst: 
-    print('right')
+print(test)

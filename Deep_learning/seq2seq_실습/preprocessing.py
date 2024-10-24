@@ -4,6 +4,9 @@ import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 from collections import defaultdict
 
+"""
+max_length보다 긴 문장은 max_length만큼만 잘라서 eos 붙여준다음에 사용함
+"""
 
 def load_file(): 
     file = glob.glob(r'C:\Users\user\Desktop\seq2seq_실습\eng-fra.txt')[0]
@@ -32,7 +35,8 @@ def load_file():
 
 def dict_vocab(sentences, voca, max_length): 
     """
-    eng_voca : List : [(단어, 쓰인 횟수), ()]
+    eng_word2idx, eng_idx2word = dict_vocab(eng_sentences, eng_voca, eng_max_length) 
+    voca : List : [(단어, 쓰인 횟수), ()]
     
     """
     word2idx = {} 
@@ -45,21 +49,20 @@ def dict_vocab(sentences, voca, max_length):
     word2idx['[SOS]'] = 1
     idx2word[1] = '[SOS]'
 
-    word2idx['EOS'] = 2
+    word2idx['[EOS]'] = 2
     idx2word[2] = '[EOS]'
 
-    word2idx['OOV'] = 3
+    word2idx['[OOV]'] = 3
     idx2word[3] = '[OOV]'
 
-    for sentence in sentences: 
+    voca_dict = {word : count for word, count in voca}
+
+    for sentence in sentences: # sentences : [['word','word','word'], ['word', 'word', 'word']]
         for word in sentence: 
-            for i in voca:
-                if word not in word2idx:
-                    if word in i[0]: 
+                if word not in word2idx and word in voca_dict:
                         word2idx[word] = idx
                         idx2word[idx] = word
                         idx += 1
-    print(word2idx)
     return word2idx, idx2word
 
 def threshold_word_voca(sentences, threshold = 0.99): 
@@ -93,28 +96,35 @@ def determine_max_sentence(sentences, threshold = 0.99):
     for sentence in sentences: 
         count = len(sentence)
         word_count_dict[count] += 1
-        total_sentence_length += count 
+        total_sentence_length += 1
 
     
-    sorted_lst = sorted(word_count_dict.items(), key = lambda x: x[1], reverse=True)
-    total_sentence_length = total_sentence_length*threshold
+    sorted_lst = sorted(word_count_dict.items(), key = lambda x: x[0])
+    # print(sorted_lst)
+    # print("before total_sentence_length :", total_sentence_length)
+    total_sentence_length = total_sentence_length*threshold # 134483.58
+    # print("after total_sentence_length :", total_sentence_length) #  : 
 
     for i in sorted_lst: 
         if sentence_count < total_sentence_length:
             sentence_count += i[1]
-            lst.append(i)
-    max_length = max(word_count_dict.items(), key = lambda x: x[0])
-    # print(max_length[0]) # eng : 47, fra : 54
+            # print(sentence_count)
+        else: 
+            max_length = i[0]
+            print("max_length:", max_length) 
+            break
     return max_length
 
-def sentence2idx(sentences, word2idx, max_length): 
+def sentence2idx(sentences, word2idx, max_length): #eng_idx_sentence = sentence2idx(eng_sentences, eng_word2idx, eng_max_length)
     res = []
-    # print("max_length", max_length) # 46
 
     for sentence in sentences:
         elem_lst = []
         for word in sentence: 
-            elem_lst.append(word2idx[word])
+            if word in word2idx: 
+                elem_lst.append(word2idx[word])
+            else: 
+                elem_lst.append(3) #OOV
         lst = elem_lst + [0 for _ in range(max_length - len(elem_lst))]
 
         if len(lst) > max_length: 
@@ -122,18 +132,25 @@ def sentence2idx(sentences, word2idx, max_length):
         res.append(lst)
     return res
 
-def sentence2idx_with_tokens(sentences, word2idx, max_length): # max_length = 53
+def sentence2idx_with_tokens(sentences, word2idx, max_length): # fra_idx_sentence = sentence2idx_with_tokens(fra_sentences, fra_word2idx, fra_max_length)
     res = []
 
     for sentence in sentences:
-        elem_lst = [1]
+        elem_lst = [1] #SOS
         for word in sentence: 
-            elem_lst.append(word2idx[word])
-        elem_lst.append(2)
+            if word in word2idx: 
+                elem_lst.append(word2idx[word])
+            else: 
+                elem_lst.append(3) # OOV
+        elem_lst.append(2) # EOS
+        
         lst = elem_lst + [0 for _ in range(max_length - len(elem_lst)+2)]
 
         if len(lst) > max_length+2: 
             lst = lst[:max_length+2]
+            if lst[-1] != 2: 
+                lst[-1] = 2
+        
         res.append(lst)
     return res
 
@@ -164,15 +181,15 @@ def split_train_valid_test(x, y, train_size = 0.8, valid_size = 0.1, test_size =
 def generate_dataset():  
     eng_sentences, fra_sentences = load_file() # eng_sentences = [['word','word','word']. []]
 
-    eng_voca = threshold_word_voca(eng_sentences, threshold = 0.99) # [(word, word_count), ()]
+    eng_voca = threshold_word_voca(eng_sentences, threshold = 0.99) # List : [(word, word_count), ()]
     fra_voca = threshold_word_voca(fra_sentences, threshold = 0.99)
 
-    eng_max_length = determine_max_sentence(eng_sentences) # 36
-    fra_max_length = determine_max_sentence(fra_sentences) # 39
+    eng_max_length = determine_max_sentence(eng_sentences) # 15
+    fra_max_length = determine_max_sentence(fra_sentences) # 17
 
-    eng_word2idx, eng_idx2word = dict_vocab(eng_sentences, eng_voca, eng_max_length) # 47
-    fra_word2idx, fra_idx2word = dict_vocab(fra_sentences, eng_voca, eng_max_length) # 54
-    return 
+    eng_word2idx, eng_idx2word = dict_vocab(eng_sentences, eng_voca, eng_max_length) # dict 
+    fra_word2idx, fra_idx2word = dict_vocab(fra_sentences, eng_voca, eng_max_length) # dict 
+
     eng_idx_sentence = sentence2idx(eng_sentences, eng_word2idx, eng_max_length) # [idx, pad]
     fra_idx_sentence = sentence2idx_with_tokens(fra_sentences, fra_word2idx, fra_max_length)
 
@@ -201,6 +218,6 @@ def generate_dataset():
     valid_dataloader = DataLoader(valid_dataset, batch_size = batch_size, shuffle= True)
     test_dataloader = DataLoader(test_dataset, batch_size = batch_size, shuffle = True)
 
-    return train_dataloader, valid_dataloader, test_dataloader, eng_max_length, fra_max_length, eng_word2idx, fra_word2idx, eng_idx2word, fra_idx2word, eng_idx_sentence, fra_idx_sentence
+    return train_dataloader, valid_dataloader, test_dataloader, eng_max_length, fra_max_length+2, eng_word2idx, fra_word2idx, eng_idx2word, fra_idx2word, eng_idx_sentence, fra_idx_sentence
 
 
