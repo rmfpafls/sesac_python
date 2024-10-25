@@ -111,7 +111,6 @@ def determine_max_sentence(sentences, threshold = 0.99):
             # print(sentence_count)
         else: 
             max_length = i[0]
-            print("max_length:", max_length) 
             break
     return max_length
 
@@ -150,7 +149,6 @@ def sentence2idx_with_tokens(sentences, word2idx, max_length): # fra_idx_sentenc
             lst = lst[:max_length+2]
             if lst[-1] != 2: 
                 lst[-1] = 2
-        
         res.append(lst)
     return res
 
@@ -193,17 +191,17 @@ def generate_dataset():
     eng_idx_sentence = sentence2idx(eng_sentences, eng_word2idx, eng_max_length) # [idx, pad]
     fra_idx_sentence = sentence2idx_with_tokens(fra_sentences, fra_word2idx, fra_max_length)
 
-    # print("eng_idx_sentence :",  len(eng_idx_sentence)) # 135842
+    # print("eng_idx_sentence :",  eng_idx_sentence) # 135842
     # print("fra_idx_sentence :", len(fra_idx_sentence)) # 135842
+    
 
     train_x, train_y, valid_x, valid_y, test_x, test_y = split_train_valid_test(eng_idx_sentence, fra_idx_sentence, train_size = 0.8, valid_size = 0.1, test_size = 0.1)
 
     train_x = torch.stack([torch.tensor(item) for item in train_x])
+    # print(train_x.size()) # torch.Size([108673, 15])
     train_y = torch.stack([torch.tensor(item) for item in train_y])  
     valid_x = torch.stack([torch.tensor(item) for item in valid_x])
     valid_y = torch.stack([torch.tensor(item) for item in valid_y]) 
-    # for idx, item in enumerate(test_x): 
-    #     print(torch.tensor(item).size()) # 진짜 맨 마지막꺼만 47임
 
     test_x = torch.stack([torch.tensor(item) for item in test_x]) ## 
     test_y = torch.stack([torch.tensor(item) for item in test_y]) 
@@ -218,6 +216,6 @@ def generate_dataset():
     valid_dataloader = DataLoader(valid_dataset, batch_size = batch_size, shuffle= True)
     test_dataloader = DataLoader(test_dataset, batch_size = batch_size, shuffle = True)
 
-    return train_dataloader, valid_dataloader, test_dataloader, eng_max_length, fra_max_length+2, eng_word2idx, fra_word2idx, eng_idx2word, fra_idx2word, eng_idx_sentence, fra_idx_sentence
+    return train_dataloader, valid_dataloader, test_dataloader, eng_max_length, fra_max_length+2, eng_word2idx, fra_word2idx, eng_idx2word, fra_idx2word, eng_idx_sentence, fra_idx_sentence, eng_voca, fra_voca
 
 
