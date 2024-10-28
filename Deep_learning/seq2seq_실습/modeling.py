@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn 
-import random
+import random 
 
 class RNNManual(nn.Module):
     def __init__(self, input_dim, hidden_dim): 
@@ -48,9 +48,11 @@ class RNNDecoder(nn.Module):
 
     def forward(self, y, encoder_last_hidden, teacher_forcing_ratio = 0.5): 
         # print(encoder_last_hidden.size()) # 32 19 
+        y = torch.transpose(y, 1, 0) 
+        # print("transpose_y.size() : ", y.size()) # torch.Size([19, 32])
         batch_size = encoder_last_hidden.size(0) # 32 19
-        fra_max_length = encoder_last_hidden.size(1)
-        hidden_dim = self.hidden_dim 
+        fra_max_length = y.size(1)
+        hidden = self.cell.init_hidden() 
         outputs = []
         hidden = encoder_last_hidden
 
@@ -59,18 +61,18 @@ class RNNDecoder(nn.Module):
         # target이 주어진 경우 : 정답 문장의 첫번째 단어를 사용해 시작할 수 있다. target이 주어진 것을 알 수 있다. 
         # target이 주어지지 않은 경우 : 정답 문장이 없어서 디코더가 예측한 단어들만을 보고 번역해야한다. [SOS] 토큰으로 시작하게 설정해 디코더가 첫 단어를 예측할 수 있게 해준다. 
         # 1*batch_size인 이유 : [SOS] 토큰을 batch_size만큼 만들어서 각 문장에 대해 디코더가 시작될 수 있도록 설정한다. 
-        
+
         for i in range(fra_max_length): 
-            embedded = self.embedding(y)
-            hidden = self.cell(embedded, hidden_dim)
+            embedded = self.embedding(decoder_input) 
+            hidden = self.cell(embedded, hidden) # 32, []
             output = self.h2o(hidden)
             output = self.softmax(output)
             outputs.append(output)
 
-            pred = torch.argmax(self.softmax(y), dim = 1)
+            pred = torch.argmax(self.softmax(y.float()), dim = 1)
 
             # teacher forcing 적용 여부 
-            if y is not None and random() < teacher_forcing_ratio: 
+            if y is not None and random.random() < teacher_forcing_ratio: 
                 decoder_input = y[:, i] # 실제 정답을 다음 입력으로 사용
             else: 
                 decoder_input = pred # 예측한 단어를 다음 입력으로 사용 
@@ -85,9 +87,9 @@ class Seq2seq(nn.Module):
         self.encoder = encoder
         self.decoder = decoder
 
-    def forward(self, x): 
+    def forward(self, x, y): 
         encoder_last_hidden = self.encoder(x)
-        output = self.decoder(encoder_last_hidden)
+        output = self.decoder(y, encoder_last_hidden)
         return output
 
      

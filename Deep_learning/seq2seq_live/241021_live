@@ -11,7 +11,7 @@ import torch.nn as nn
 
 class RNNManual(nn.Module):
     def __init__(self, input_dim, hidden_dim):
-        super(RNNManual).__init__()
+        super(RNNManual, self).__init__()
         self.i2h = nn.Linear(input_dim, hidden_dim)
         self.h2h = nn.Linear(hidden_dim, hidden_dim)
         self.input_dim = input_dim 
@@ -27,7 +27,7 @@ class RNNManual(nn.Module):
 
 class RNNEncoder(nn.Module):
     def __init__(self, hidden_dim, source_vocab, embedding_dim):
-        super(RNNEncoder).__init__()
+        super(RNNEncoder, self).__init__()
         self.cell = RNNManual(embedding_dim, hidden_dim)
         self.embedding = nn.Embedding(source_vocab.vocab_size, embedding_dim)
         self.vocab = source_vocab
@@ -42,7 +42,7 @@ class RNNEncoder(nn.Module):
         
         for t in range(source_seq_length):
             char = x[:, t] # char: (batch_size, 1, vocab_size)
-            embedded = self.embedding(char).unsqueeze(1) # embedded: (batch_size, embedding_dim)
+            embedded = self.embedding(char).unsqueeze(1) # embedded: (batch_size, embedding_dim,1)
             hidden = self.cell(embedded, hidden) # hidden: (batch_size, hidden_dim)
             assert hidden.size() == (batch_size, self.hidden_dim)
 
@@ -50,7 +50,7 @@ class RNNEncoder(nn.Module):
     
 class RNNDecoder(nn.Module):
     def __init__(self, hidden_dim, target_vocab, embedding_dim):
-        super(RNNDecoder).__init__()
+        super(RNNDecoder, self).__init__()
         self.cell = RNNManual(embedding_dim, hidden_dim)
         self.embedding = nn.Embedding(target_vocab.vocab_size, embedding_dim)
         self.h2o = nn.Linear(hidden_dim, target_vocab.vocab_size)

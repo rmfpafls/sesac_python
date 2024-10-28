@@ -58,8 +58,8 @@ if __name__ == "__main__":
     file_path = 'loss_history.pkl'
 
     for lr in range(len(learning_rate)): 
-        # model = FeedForwardNetwork(alphabets = alphabets , hidden_size = 32, languages = languages, max_length = max_length).to(device)
-        model = RNN(alphabets, hidden_size = 32, languages = languages, max_length = max_length)
+        model = FeedForwardNetwork(alphabets = alphabets , hidden_size = 32, languages = languages, max_length = max_length).to(device)
+        # model = RNN(alphabets, hidden_size = 32, languages = languages, max_length = max_length)
         train_loss_history_dict, valid_loss_history, pickle_loss_and_model = train_model(model, train_dataloader, valid_dataloader, device, epochs = epochs, learning_rate = learning_rate[lr])
         train_loss_history.append(train_loss_history_dict)
         vaild_loss_history.append(valid_loss_history)

@@ -6,6 +6,7 @@ import torch
 from evaluate import model_evaluate
 
 def valid(model, valid_dataset, learning_rate, device): 
+# pickle_loss_and_model[(lr, save_loss, accuarcy)] = state_dict
     loss_and_model_dict = pickle.load(open('loss_history.pkl', 'rb'))
 
     accuarcy_list = []
