@@ -18,3 +18,11 @@ class BatchNormalization(nn.Module):
         x_hat = (x - mean) / torch.sqrt(std + self.eps)
 
         return self.gamma * x_hat + self.beta
+
+# gradient accumulation 
+# gradient clipping
+# drop out 
+# weight decay
+# learning rate scheduling
+# warm up
+
