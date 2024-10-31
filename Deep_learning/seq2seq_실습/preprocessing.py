@@ -185,8 +185,10 @@ def generate_dataset():
     eng_max_length = determine_max_sentence(eng_sentences) # 15
     fra_max_length = determine_max_sentence(fra_sentences) # 17
 
+    # print(len(eng_voca), len(fra_voca), eng_max_length, fra_max_length) # 1957 2380 37 49
+
     eng_word2idx, eng_idx2word = dict_vocab(eng_sentences, eng_voca, eng_max_length) # dict 
-    fra_word2idx, fra_idx2word = dict_vocab(fra_sentences, eng_voca, eng_max_length) # dict 
+    fra_word2idx, fra_idx2word = dict_vocab(fra_sentences, fra_voca, fra_max_length) # dict 
 
     eng_idx_sentence = sentence2idx(eng_sentences, eng_word2idx, eng_max_length) # [idx, pad]
     fra_idx_sentence = sentence2idx_with_tokens(fra_sentences, fra_word2idx, fra_max_length)

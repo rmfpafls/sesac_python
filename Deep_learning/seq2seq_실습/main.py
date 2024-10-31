@@ -5,11 +5,12 @@ from training import train_model
 if __name__ == "__main__":
     train_dataloader, valid_dataloader, test_dataloader, eng_max_length, fra_max_length, eng_word2idx, fra_word2idx, eng_idx2word, fra_idx2word, eng_idx_sentence, fra_idx_sentence, eng_voca, fra_voca = generate_dataset() 
     # train_dataloader = [batch_size, 108673, 15]
-    # print(eng_voca)
+
     encoder = RNNEncoder(eng_voca, eng_max_length, hidden_dim = 32, embedding_dim = 30)
     decoder = RNNDecoder(fra_voca, fra_max_length, hidden_dim = 32, embedding_dim = 30) 
     model = Seq2seq(encoder, decoder)
-    train_loss_history, vaild_loss_history = train_model(model, train_dataloader, valid_dataloader, epochs = 100, learning_rate = 0.001)
+    train_loss_history, vaild_loss_history = train_model(model, train_dataloader, valid_dataloader, eng_idx2word, fra_idx2word, epochs = 300, learning_rate = 0.001)
+    
 
 
     # for x, y in train_dataloader:

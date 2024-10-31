@@ -1,6 +1,5 @@
-test = [1,2,3,4,5,6]
+test = [1,2,3,0,0,0,0]
 
-for i in range(-3): 
-    test.append('7')
+x = list(filter(lambda x : x != 0, test))
 
-print(test)
+print(x)
