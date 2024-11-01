@@ -25,14 +25,3 @@
 # a_list.append(b_dict)
 # print(a_list)
 
-
-class car(): 
-    def __init__(self, color = 파란색 ): 
-        self.창문 = 4
-        self.바퀴 = 2
-        self.와이퍼 = color 
-
-
-모닝 = car(color = 빨간색)
-소나타 = car( )
-print(모닝.바퀴)

@@ -4,9 +4,6 @@ from torch.utils.data import DataLoader, random_split
 from collections import defaultdict
 from debug_shell import debug_shell 
 
-
-# source_vocab = Vocabulary(source_word_count)
-# target_vocab = Vocabulary(target_word_count)
 class Vocabulary:
     PAD = '[PAD]'
     SOS = '[SOS]'
@@ -18,7 +15,7 @@ class Vocabulary:
     EOS_IDX = 2 
     OOV_IDX = 3
 
-    def __init__(self, word_count, coverage = 0.999): #source_vocab = Vocabulary(source_word_count)
+    def __init__(self, word_count, coverage = 0.999):
         """Accept word_count dictionary having word as key, and frequency as value.
         """
         word_freq_list = []
@@ -64,7 +61,7 @@ def parse_file(file_path,
         source, target, etc = line.split('\t')
 
         source = source.split()
-        for source_token in source: # source = [단어, 단어 ] 
+        for source_token in source:
             source_word_count[source_token] += 1 
 
         target = target.split()
