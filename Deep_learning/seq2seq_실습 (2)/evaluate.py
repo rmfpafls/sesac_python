@@ -4,6 +4,34 @@ import math
 
 from bleu import bleu
 
+def vetor2word(x, y, y_pred, eng_idx2word, fra_idx2word): 
+    eng_dict = dict(eng_idx2word)
+    fra_dict = dict(fra_idx2word) 
+
+    x.tolist()
+    y.tolist() 
+
+    x = [[e.item() for e in tensor if e.item() != 0] for tensor in x]
+    y = [[e.item() for e in tensor if e.item() != 0] for tensor in y]
+    y_pred = torch.argmax(y_pred, dim = -1)
+    y_pred = [[fra_dict.get(idx.item(), "[OOV]") for idx in tensor if idx.item() in fra_dict] for tensor in y_pred]
+
+    x = [[eng_dict[lst_lst] for lst_lst in lst ] for lst in x]
+    y = [[fra_dict[lst_lst] for lst_lst in lst ] for lst in y]
+
+    for i in range(len(y)): 
+        print(f"y[{i}] : " , y[i], '\n\n')
+        print(f"y_pred[{i}]", y_pred[i], '\n\n')
+        print("DONE\n\n")
+
+        bleu = bleu(y[i], y_pred[i])
+        print(f"BLEU score: {bleu:.4f}")
+
+    # print(f"{x[0]}\n\n{y[0]}\n\n{y_pred[0]}\n\n")
+
+
+
+
 def model_evaluate(self, eng_voca, fra_voca, test_data, lr): 
     self.eval() 
     criterion = F.nll_loss 
@@ -45,27 +73,3 @@ def model_evaluate(self, eng_voca, fra_voca, test_data, lr):
 
     return accuarcy, min_loss, pickle_loss_and_model, loss_list
 
-def vetor2word(x, y, y_pred, eng_idx2word, fra_idx2word): 
-    eng_dict = dict(eng_idx2word)
-    fra_dict = dict(fra_idx2word) 
-
-    x.tolist()
-    y.tolist() 
-
-    x = [[e.item() for e in tensor if e.item() != 0] for tensor in x]
-    y = [[e.item() for e in tensor if e.item() != 0] for tensor in y]
-    y_pred = torch.argmax(y_pred, dim = -1)
-    y_pred = [[fra_dict.get(idx.item(), "[OOV]") for idx in tensor if idx.item() in fra_dict] for tensor in y_pred]
-
-    x = [[eng_dict[lst_lst] for lst_lst in lst ] for lst in x]
-    y = [[fra_dict[lst_lst] for lst_lst in lst ] for lst in y]
-
-    # print(len(x[0]))
-    # print(f"{x[0]}\n{y[0]}\n{y_pred[0]}")
-
-    for i in x:
-        print(i)
-        break
-        # for j in range(len(i)): 
-        #     print(i[j])
-        #     break

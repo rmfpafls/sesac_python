@@ -60,10 +60,11 @@ def bleu(candidate, reference, max_n=4):
     
     return bleu_score * bp
 
-if __name__ == '__main__':
-    # Example usage
-    reference = "this is a great test".split()
-    candidate = "this test is a great test".split()
+# if __name__ == '__main__':
+#     # Example usage
+#     reference = "this is a great test".split()
+#     candidate = "this test is a great test".split()
 
-    bleu = bleu(candidate, reference)
-    print(f"BLEU score: {bleu:.4f}")
+#     print(reference)
+#     bleu = bleu(candidate, reference)
+#     print(f"BLEU score: {bleu:.4f}")

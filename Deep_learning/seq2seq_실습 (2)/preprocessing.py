@@ -9,7 +9,7 @@ max_length보다 긴 문장은 max_length만큼만 잘라서 eos 붙여준다음
 """
 
 def load_file(): 
-    file = glob.glob(r'C:\Users\user\Desktop\seq2seq_실습\small_eng-fra.txt')[0]
+    file = glob.glob(r'C:\Users\hyunji\OneDrive\문서\GitHub\sesac_python\Deep_learning\seq2seq_실습 (2)\small_eng-fra.txt')[0]
 
     eng = []
     fran = []
